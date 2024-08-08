@@ -1,0 +1,84 @@
+var port = 1234;
+var dstIP = "192.168.0.100";
+var socket;
+var count = 0;
+
+var HTML_top = '<HTML>\
+  <HEAD>\
+    <TITLE>Parking Manager</TITLE>\
+    <STYLE>\
+        #container{\
+          width:100%;\
+          background-color: black;\
+        }\
+        #header{\
+          width:100%;\
+          background-color: black;\
+          color: #999999;\
+        }\
+        #data{\
+          color: #333333;\
+        }\
+        .parking-spot {\
+          width:100%;\
+        }\
+    </STYLE>\
+    <SCRIPT>\
+        function init() {\
+           setTimeout(reloadPage, 1000);\
+        }\
+        function reloadPage() {\
+           window.location.reload(true);\
+        }\
+    </SCRIPT>\
+  </HEAD>\
+  <BODY onload="init();" bgcolor="#000000">\
+  	<DIV ID="container">\
+           <DIV ID="header"><h1>City Parking Manager</h1></DIV>\
+           <DIV ID="data">';
+
+var HTML_bottom = "</DIV></DIV></BODY></HTML>";
+
+function setup() {
+	socket = new UDPSocket();
+	
+	// when receiving data
+	socket.onReceive = function(ip, port, data) {
+		Serial.println("received from " + ip + ":" + port + ": \n\t" + data);
+	};
+	
+	// start UDP socket on port
+	Serial.println(socket.begin(port));
+	Serial.println(HTTPServer.start(80));
+}
+
+function loop() {
+	var p1 = digitalRead(0);
+	var p2 = digitalRead(1);
+	var p3 = digitalRead(2);
+	var p4 = digitalRead(3);
+	console.log(p1, p2, p3, p4);
+	updateHTML(p1, p2, p3, p4);
+	delay(5000);
+	
+	// send one msg every sec
+	// socket.send(dstIP, port, "hello " + (count++));
+}
+
+function updateHTML(p1, p2, p3, p4) {
+	var parkingSpots = [p1, p2, p3, p4];
+	var HTMLContent = '';
+
+	for (var i = 0; i < parkingSpots.length; i++) {
+		var status = parkingSpots[i] > 0 ? "taken" : "free";
+		var color = parkingSpots[i] > 0 ? "#ff0000" : "#00ff00";
+		HTMLContent += '<div class="parking-spot" id="p' + (i + 1) + '"><p style="background-color:' + color + ';">Parking spot ' + (i + 1) + ' is ' + status + '.</p></div>';
+	}
+
+	var HTMLDoc = HTML_top + HTMLContent + HTML_bottom;
+	console.log("HTMLDoc created.");
+	
+	HTTPServer.route("/*", function(url, response) { 
+		response.send(HTMLDoc); 
+	});
+}
