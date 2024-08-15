@@ -1,0 +1,33 @@
+var SUNRISE = 6; // Sun rises at 6 AM
+var NOON = 12;   // Noon
+var SUNSET = 20; // Sun sets at 8 PM
+var totalSeconds = 0; // Total number of seconds passed
+var currentHour = 0; // Current hour of the day
+var opacity = 0;
+
+setComponentOpacity("component 1", opacity); // Set the initial sun's opacity to 0%
+
+function setup() {
+	// Initialization code, if any, can be added here
+}
+
+function loop() {
+	totalSeconds = Environment.getTimeInSeconds();
+	currentHour = (totalSeconds / 3600) % 24; // Calculate the current hour of the day
+	
+	if (currentHour < SUNRISE || currentHour > SUNSET) {
+		opacity = 0;
+	} else if (currentHour === SUNRISE || currentHour === SUNSET) {
+		opacity = 0;
+	} else if (currentHour === NOON) {
+		opacity = 1;
+	} else if (currentHour > SUNRISE && currentHour < NOON) {
+		opacity = (currentHour - SUNRISE) / (NOON - SUNRISE);
+	} else if (currentHour > NOON && currentHour < SUNSET) {
+		opacity = 1 - ((currentHour - NOON) / (SUNSET - NOON));
+	}
+	
+	setComponentOpacity("component 1", opacity); // Set the sun opacity
+	console.log(currentHour);
+	delay(200); // Wait 0.2 seconds before executing another loop
+}
