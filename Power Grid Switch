@@ -1,0 +1,30 @@
+function setup() {
+	console.log("Power Switch");
+	analogWrite(A3, 5); // Initial setting, possibly indicating no power source is active
+}
+
+function loop() {
+	var windPower = analogRead(A0);
+	var solarPower = analogRead(A1);
+	var coalPower = analogRead(A2);
+
+	console.log("Wind Power: " + windPower);
+	console.log("Solar Power: " + solarPower);
+	console.log("Coal Power: " + coalPower);
+
+	if (solarPower > 0) {
+		console.log("Switching to Solar Power...");
+		analogWrite(A3, 1);
+	} else if (windPower > 0) {
+		console.log("Switching to Wind Power...");
+		analogWrite(A3, 2);
+	} else if (coalPower > 0) {
+		console.log("Switching to Coal Power...");
+		analogWrite(A3, 0);
+	} else {
+		console.log("Blackout!");
+		analogWrite(A3, 5); // Indicates a blackout or no power source
+	}
+
+	delay(100); // Delay for 0.1 seconds before the next loop iteration
+}
