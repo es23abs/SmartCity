@@ -1,0 +1,32 @@
+const SUNRISE = 6; // sunrise at 6am
+const NOON = 12; // noon
+const SUNSET = 20; // sunset at 8pm
+
+let totalSeconds = 0; // total number of seconds passed
+let hours = 0; // current hour of the day
+let opacity = 0;
+
+setComponentOpacity("component 1", 0); // set the sun's opacity to 0%
+
+function setup() {
+    // Any setup code can go here
+}
+
+function loop() {
+    totalSeconds = Environment.getTimeInSeconds();
+    hours = (totalSeconds / 3600) % 24; // calculate the hour in the day
+
+    if (hours < SUNRISE || hours > SUNSET) {
+        opacity = 0; // night time, no sunlight
+    } else if (hours === NOON) {
+        opacity = 1; // full sunlight at noon
+    } else if (hours >= SUNRISE && hours < NOON) {
+        opacity = (hours - SUNRISE) / (NOON - SUNRISE); // sunrise to noon
+    } else if (hours > NOON && hours <= SUNSET) {
+        opacity = (SUNSET - hours) / (SUNSET - NOON); // noon to sunset
+    }
+
+    setComponentOpacity("component 1", opacity); // set the sun's opacity based on calculated value
+    console.log(hours);
+    delay(200); // wait 0.2 second before executing another loop
+}
