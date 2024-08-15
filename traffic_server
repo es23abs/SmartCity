@@ -1,0 +1,63 @@
+var port = 81;
+var tln_1 = "10.10.10.6";
+//var tln_2 = "10.10.10.7";
+var tlw_1 = "10.10.10.8";
+//var tlw_2 = "10.10.10.9";
+
+var socket;
+var count = 0;
+var coords = "";
+
+function setup() {
+    socket = new UDPSocket();
+    
+    // Start UDP socket on port
+    Serial.println(socket.begin(port));
+
+    // When receiving data
+    socket.onReceive = function(ip, port, data) {
+        Serial.println("Received from " + ip + ":" + port + ": \n\t" + data);
+        
+        if (data) {
+            coords = data;
+            handleCoords(coords);
+        }
+    };
+}
+
+function handleCoords(coords) {
+    var c = coords.split(",");
+    var x = Number(c[0]);
+    var y = Number(c[1]);
+
+    if (x > 450 && x < 1010) {
+        freeTheRoad();
+    } else {
+        backToNormal();
+    }
+}
+
+function freeTheRoad() {
+    console.log("Emergency vehicle approaching");
+    socket.send(tln_1, port, "0");
+    socket.send(tlw_1, port, "2");
+}
+
+function backToNormal() {
+    socket.send(tln_1, port, "2");
+    socket.send(tlw_1, port, "0");
+}
+
+function loop() {
+    // Uncomment this section if needed in the future
+    /*
+    // Send one msg every sec
+    socket.send(dstIP, port, "hello " + (count++));
+    */
+    
+    /*
+    add_event_detect(A0, detect)
+    while True:
+        delay(1000)
+    */
+}
